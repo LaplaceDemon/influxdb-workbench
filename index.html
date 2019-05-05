@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>InfluxDB Workbench</title>
+</head>
+<body>
+<h1>InfluxDB Workbench</h1>
+<script src="script/vue.js"></script>
+
+<a href="javascript:void(0);" onclick="reflush()">刷新</a>
+<ul id="databases">
+    <li v-for="elem in list">{{elem}}</li>
+</ul>
+<div id="app">
+    {{ message }}
+</div>
+<div id="query">
+    <div>
+        <textarea v-model="sql"></textarea>
+        <input type="button" value="query/execute" onclick="query()">
+    </div>
+    <div>
+        <table>
+            <tr>
+                <th></th>
+            </tr>
+            <tr>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+</div>
+<script src="script/index.js"></script>
+</body>
+</html>
