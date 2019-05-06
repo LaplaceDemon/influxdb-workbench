@@ -14,7 +14,13 @@ var app = new Vue({
 var databases = new Vue({
     el: '#databases',
     data: {
-      list: []
+      list: [],
+      useDatabase:""
+    },
+    methods:{
+        clickUseDatabase:function(event) {
+            databases.useDatabase = event.target.value;
+        }
     }
 });
 
@@ -35,46 +41,92 @@ request("http://127.0.0.1:8086/query?q=show databases", function (error, respons
 });
 
 var queryer = new Vue({
-    el: '#query',
+    el: '#queryer',
     data: {
         sql:"",
-        results:[]
+        results:[],
+        timeFormat:"",
+        log:""
     }
 });
 
-function query() {
+function fillInShowDatabasesSqlTemplate() {
+    queryer.sql = "show databases;";
+}
+
+function fillInShowMeasurementsSqlTemplate() {
+    queryer.sql = "SHOW MEASUREMENTS;";
+}
+
+function querySQL() {
     console.log(queryer.sql);
-    var url = "http://127.0.0.1:8086/query?";
+    var sql = queryer.sql.trim();
 
-    url += "db=" +  "testdb";
-    url += "&q=" + queryer.sql;
+    var url = "http://127.0.0.1:8086";
+    var method = "";
 
-    request(url, function (error, response, body) {
-        if (!error && response.statusCode == 200) {
-            var data = JSON.parse(body);
-            results = data.results;
-        } else {
-            console.error(error);
+    
+    if(StringUtil.stringStartWithIgnoreCase(sql, "show") || StringUtil.stringStartWithIgnoreCase(sql, "select")) {
+        url += "/query?"
+        method = "GET";
+    } else {
+        url += "/write?"
+        method = "POST";
+    }
+
+    var queryStringList = [];
+    if(databases.useDatabase) {
+        queryStringList.push("db=" + databases.useDatabase);
+    }
+
+    if(sql.startsWith("select")) {
+        if(queryer.timeFormat!="" && queryer.timeFormat!="normarl") {
+            queryStringList.push("epoch=" + queryer.timeFormat);
         }
-    });
+    }
+
+    queryStringList.push("q=" + queryer.sql);
+
+    url += queryStringList.join("&");
+
+    request (
+        {
+            "method":method,
+            "uri":url
+        },
+        function (error, response, body) {
+            if (!error) {
+                if (response.statusCode == 200) {
+                    var data = JSON.parse(body);
+                    queryer.results = data.results;
+
+                    // check
+                    var errorMessage = "";
+                    var hasError = false;
+                    for(var i in data.results) {
+                        var result = data.results[i];
+                        if (result.error) {
+                            hasError = true;
+                            errorMessage += ("\n" + result.error);
+                        }
+                    }
+                    
+                    if (hasError) {
+                        queryer.log = ("error:" + errorMessage);
+                    } else {
+                        queryer.log = ("success:");
+                    }
+
+                } else if(response.statusCode == 204) {
+                    queryer.log = "sucess: " + "no content";
+                } else {
+                    queryer.log = "error: " + body;
+                }
+            } else {
+                queryer.log = "error:" + body + "/nerror:" + (error);
+            }
+        }
+    );
 
 }
 
-
-// const request = net.request('https://github.com');
-
-// request.on('response', (response) => {
-//     console.log(`STATUS: ${response.statusCode}`)
-//     console.log(`HEADERS: ${JSON.stringify(response.headers)}`)
-
-//     response.on('data', (chunk) => {
-//         console.log(`BODY: ${chunk}`)
-//         alert(chunk);
-//     })
-
-//     response.on('end', () => {
-//         console.log('No more data in response.')
-//     })
-// })
-
-// request.end();
