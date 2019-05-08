@@ -1,16 +1,5 @@
 var request = require('request');
 
-function reflush() {
-    alert("点击刷新");
-}
-
-var app = new Vue({
-    el: '#app',
-    data: {
-      message: 'Hello Vue!'
-    }
-});
-
 var databases = new Vue({
     el: '#databases',
     data: {
@@ -23,10 +12,6 @@ var databases = new Vue({
         }
     }
 });
-
-setTimeout(function(){
-    app.message="hello Electron"
-}, 2000);
 
 request("http://127.0.0.1:8086/query?q=show databases", function (error, response, body) {
     if (!error && response.statusCode == 200) {
@@ -55,7 +40,27 @@ function fillInShowDatabasesSqlTemplate() {
 }
 
 function fillInShowMeasurementsSqlTemplate() {
-    queryer.sql = "SHOW MEASUREMENTS;";
+    queryer.sql = "show measurements;";
+}
+
+function fillInSelectSqlTemplate() {
+    queryer.sql = "SELECT <field_key>[,<field_key>,<tag_key>] FROM <measurement_name>[,<measurement_name>]";
+}
+
+function fillInWhereSqlTemplate() {
+    queryer.sql += " WHERE <conditional_expression> [(AND|OR) <conditional_expression> [...]]";
+}
+
+function fillInGroupBySqlTemplate() {
+    queryer.sql += " GROUP BY [* | <tag_key>[,<tag_key]]";
+}
+
+function fillInShowSubscriptionsSqlTemplate() {
+    queryer.sql = "show subscriptions";
+}
+
+function fillInShowRetentionPoliciesSqlTemplate() {
+    queryer.sql = 'show retention policies [on "<database>"]';
 }
 
 function querySQL() {
@@ -79,7 +84,7 @@ function querySQL() {
         queryStringList.push("db=" + databases.useDatabase);
     }
 
-    if(sql.startsWith("select")) {
+    if(StringUtil.stringStartWithIgnoreCase(sql, "select")) {
         if(queryer.timeFormat!="" && queryer.timeFormat!="normarl") {
             queryStringList.push("epoch=" + queryer.timeFormat);
         }
@@ -89,12 +94,15 @@ function querySQL() {
 
     url += queryStringList.join("&");
 
+    var requestTimestamp = new Date().getTime();
     request (
         {
             "method":method,
             "uri":url
         },
         function (error, response, body) {
+            var responseTimestamp = new Date().getTime();
+            var dt = (responseTimestamp - requestTimestamp)/1000.0;
             if (!error) {
                 if (response.statusCode == 200) {
                     var data = JSON.parse(body);
@@ -114,16 +122,18 @@ function querySQL() {
                     if (hasError) {
                         queryer.log = ("error:" + errorMessage);
                     } else {
-                        queryer.log = ("success:");
+                        queryer.log = ("success: cost " + dt + " s");
                     }
 
                 } else if(response.statusCode == 204) {
-                    queryer.log = "sucess: " + "no content";
+                    queryer.log = "sucess: cost " + dt + " s" + ", no content";
                 } else {
                     queryer.log = "error: " + body;
+                    queryer.results = [];
                 }
             } else {
                 queryer.log = "error:" + body + "/nerror:" + (error);
+                queryer.results = [];
             }
         }
     );
