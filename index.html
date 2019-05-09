@@ -3,71 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <title>InfluxDB Workbench</title>
+    <script src="script/vue.js"></script>
 </head>
 <body>
-<h1>InfluxDB Workbench</h1>
+<h3>InfluxDB</h3>
 <script src="script/string.js"></script>
 <script src="script/vue.js"></script>
-<div id="databases">
-    <ul>
-        <li v-for="elem in list">
-            <input v-bind:value="elem" type="button" v-on:click="clickUseDatabase">
-        </li>
-    </ul>
-    <p>USE {{useDatabase}}</p>
+<div id="influxdbConnector">
+    <form>
+        <label>url: </label><span>http://</span><input v-model="url" type="input">
+        <label>username: </label><input v-model="username" type="input">
+        <label>password: </label><input v-model="password" type="password">
+        <input type="button" value="连接" v-on:click="connect">
+        <input type="button" value="取消" v-on:click="clean">
+    </form>
 </div>
-<div id="queryer">
-    <div>
-        <div>
-            <input type="button" value="Show Databases" onclick="fillInShowDatabasesSqlTemplate()">
-            <input type="button" value="Show Measurements" onclick="fillInShowMeasurementsSqlTemplate()">
-            <input type="button" value="Select Template" onclick="fillInSelectSqlTemplate()">
-            <input type="button" value="Where Template" onclick="fillInWhereSqlTemplate()">
-            <input type="button" value="Group By Template" onclick="fillInGroupBySqlTemplate()">
-            <input type="button" value="Show Subscriptions" onclick="fillInShowSubscriptionsSqlTemplate()">
-            <input type="button" value="Show Retention Policies" onclick="fillInShowRetentionPoliciesSqlTemplate()">
-            <!--
-            <input type="button" value="show databases" onclick="fillInShowDatabasesSqlTemplate()">
-            <input type="button" value="show databases" onclick="fillInShowDatabasesSqlTemplate()">
-            <input type="button" value="show databases" onclick="fillInShowDatabasesSqlTemplate()">
-            <input type="button" value="show databases" onclick="fillInShowDatabasesSqlTemplate()">
-            <input type="button" value="show databases" onclick="fillInShowDatabasesSqlTemplate()">
-            -->
-        </div>
-        <div>
-            <input type="button" value="query/execute" onclick="querySQL()">
-            
-        </div>
-        <div>
-                查询：时间精度：
-                <select v-model="timeFormat">
-                    <option selected value="">正常格式</option>
-                    <option value="ns">ns</option>
-                    <option value="u">u</option>
-                    <option value="µ">µ</option>
-                    <option value="ms">ms</option>
-                    <option value="s">s</option>
-                    <option value="m">m</option>
-                    <option value="h">h</option>
-                </select>
-        </div>
-        <textarea v-model="sql" style="width:100%" rows="10"></textarea>
-    </div>
-    <div>
-        <pre>{{log}}</pre>
-    </div>
-    <div style="witdh:600px; height:200px">
-        <div v-for="result in results">
-            <table v-for="serie in result.series">
-                <tr>
-                    <th v-for="column in serie.columns">{{column}}</th>
-                </tr>
-                <tr v-for="row in serie.values">
-                    <td v-for="v in row">{{v}}</td>
-                </tr>
-            </table>
-        </div>
-    </div>
 </div>
 <script src="script/index.js"></script>
 </body>

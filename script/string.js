@@ -1,5 +1,11 @@
 
 var StringUtil = {
+    isNotEmpty:function(str) {
+        if(str && str!=null && str.length > 0) {
+            return true;
+        }
+        return false;
+    },
     stringStartWithIgnoreCase:function(str, start) {
         for(var i = 0; i < start.length; i++) {
             var c1 = str.charCodeAt(i);
@@ -21,7 +27,5 @@ var StringUtil = {
     
         return true;
     }
-
-
 }
 
