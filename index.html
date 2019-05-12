@@ -6,16 +6,16 @@
     <script src="script/vue.js"></script>
 </head>
 <body>
-<h3>InfluxDB</h3>
+<h3>连接你的 InfluxDB</h3>
 <script src="script/string.js"></script>
 <script src="script/vue.js"></script>
 <div id="influxdbConnector">
     <form>
-        <label>url: </label><span>http://</span><input v-model="url" type="input">
-        <label>username: </label><input v-model="username" type="input">
-        <label>password: </label><input v-model="password" type="password">
+        <label>url: </label><span>http://</span><input v-model="url" type="input"><br>
+        <label>username: </label><input v-model="username" type="input"><br>
+        <label>password: </label><input v-model="password" type="password"><br>
         <input type="button" value="连接" v-on:click="connect">
-        <input type="button" value="取消" v-on:click="clean">
+        <input type="button" value="取消" v-on:click="clean"><br>
     </form>
 </div>
 </div>

@@ -8,9 +8,9 @@ const url = require('url');
 
 function createWindow () {
     // 隐藏菜单
-    // Menu.setApplicationMenu(null);
+    Menu.setApplicationMenu(null);
     // 创建浏览器窗口
-    win = new BrowserWindow({width:300, height:400, webPreferences: {
+    win = new BrowserWindow({width:600, height:300, webPreferences: {
         nodeIntegration: true   // 打开这个选项，否则在页面级的js无法使用require()函数。
       }})
     // 然后加载应用的 index.html
@@ -21,7 +21,7 @@ function createWindow () {
 
     // win.loadURL("index.html");
     // win.setAlwaysOnTop(true);
-    win.webContents.openDevTools();
+    // win.webContents.openDevTools();
 }
 
 app.on('ready', createWindow);
@@ -29,8 +29,8 @@ app.on('ready', createWindow);
 ipc.on('openInfluxdb',function() {
     // Menu.setApplicationMenu(true);
     var newwin = new BrowserWindow({
-        width: 600, 
-        height: 400,
+        width: 1280, 
+        height: 800,
         frame:true,
         parent: win, //win是主窗口
         webPreferences: {

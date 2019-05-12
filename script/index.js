@@ -15,9 +15,8 @@ var influxdbConnector = new Vue({
         },
         connect: function(event) {
             var queryString = "url=" + this.url + "&username=" + this.username + "&password=" + this.password;
-            var subwin = window.open('./influxdb-work.html?' + queryString, 'TSDB 工作台', 'width=1280,height=900')
+            var subwin = window.open('./influxdb-work.html?' + queryString, 'TSDB 工作台', "_blank", 'width=1280,height=900')
             // ipc.send("openInfluxdb");
-            subwin.webContents.openDevTools();
         }
     }
 });
